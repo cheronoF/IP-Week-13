@@ -1,0 +1,538 @@
+
+# DEFINING THE QUESTION
+
+Kira Plastinina is a Russian brand that is sold through a defunct chain of retail stores in Russia, Ukraine, Kazakhstan, Belarus, China, Philippines, and Armenia.
+
+The brand's Sales and Marketing team would like to understand their customer's behavior from data that they have collected over the past year. More specifically, they would like to learn the characteristics of customer groups.
+
+This Markdown which consists of the following sections
+
+Problem Definition
+Data Sourcing
+Check the Data
+Perform Data Cleaning
+Perform Exploratory Data Analysis  (Univariate, Bivariate & Multivariate)
+Implement the Solution
+Challenge the Solution
+Follow up Questions
+
+
+The dataset url -[http://bit.ly/EcommerceCustomersDataset]
+
+
+The dataset consists of 10 numerical and 8 categorical attributes. The 'Revenue' attribute can be used as the class label
+
+"Administrative", "Administrative Duration", "Informational", "Informational Duration", "Product Related" and "Product Related Duration" represents the number of different types of pages visited by the visitor in that session and total time spent in each of these page categories. The values of these features are derived from the URL information of the pages visited by the user and updated in real-time when a user takes an action, e.g. moving from one page to another
+
+The "Bounce Rate", "Exit Rate" and "Page Value" features represent the metrics measured by "Google Analytics" for each page in the e-commerce site
+
+The value of the "Bounce Rate" feature for a web page refers to the percentage of visitors who enter the site from that page and then leave ("bounce") without triggering any other requests to the analytics server during that session
+
+The value of the "Exit Rate" feature for a specific web page is calculated as for all pageviews to the page, the percentage that was the last in the session
+
+The "Page Value" feature represents the average value for a web page that a user visited before completing an e-commerce transaction
+
+The "Special Day" feature indicates the closeness of the site visiting time to a specific special day (e.g. Mother’s Day, Valentine's Day) in which the sessions are more likely to be finalized with the transaction
+The value of this attribute is determined by considering the dynamics of e-commerce such as the duration between the order date and delivery date. For example, for Valentine’s day, this value takes a nonzero value between February 2 and February 12, zero before and after this date unless it is close to another special day, and its maximum value of 1 on February 8
+
+The dataset also includes the operating system, browser, region, traffic type, visitor type as returning or new visitor, a Boolean value indicating whether the date of the visit is weekend, and month of the year.
+------------------------------------------------------------------------
+
+# METRICS OF SUCCESS
+
+### 1.Perform clustering stating insights drawn from your analysis and visualizations.
+
+### 2.Upon implementation, provide comparisons between the approaches learned this week i.e. K-Means clustering vs Hierarchical clustering highlighting the strengths and limitations of each approach in the context of your analysis.
+
+# EXPERIMENTAL DESIGN 
+
+The Markdown contains the following following sections.
+
+------------------------------------------------------------------------
+
+- Problem Statement
+
+#### 2.Data Sourcing
+
+#### 3.Check the Data
+
+#### 4.Perform Data Cleaning
+
+#### 5.Perform Exploratory Data Analysis (Univariate, Bivariate & Multivariate)
+
+#### 6.Implement the Solution
+
+#### 7.Challenge the Solution
+
+#### 8.Follow up Questions
+
+1. READING THE DATASET
+
+
+```{r}
+
+#install.packages("R6")
+
+
+```
+
+
+
+```{r}
+
+local({r <- getOption("repos"); r["CRAN"] <- "https://cran.r-project.org/"; options(repos = r)})
+
+```
+
+
+
+```{r}
+# Loading the libraries 
+
+library(data.table)
+library(tidyverse)
+
+```
+
+
+```{r}
+# Reading the data
+
+ecommerce <- read.csv("http://bit.ly/EcommerceCustomersDataset")
+
+```
+
+
+```{r}
+##Previewing the first 5 rows
+
+head(ecommerce)
+
+```
+
+```{r}
+##Previewing the last 5 rows
+
+tail(ecommerce)
+
+```
+
+2. EXPLORING THE DATASET
+
+```{r}
+
+##Viewing the dataset
+View(ecommerce)
+
+```
+
+```{r}
+##Checking the shape of the dataset
+
+dim(ecommerce)
+
+```
+The dataset has 12330 rows and 18 columns
+
+
+```{r}
+##Checking information of the dataset
+
+str(ecommerce)
+
+```
+
+```{r}
+##checking the column names of the dataset
+
+colnames(ecommerce)
+
+```
+
+```{r}
+##Checking the datatypes of the dataset
+
+class(ecommerce)
+sapply(ecommerce,class)
+
+```
+
+```{r}
+##Important features
+
+df <- ecommerce[, c(1,2,3,4,5,6,7,8,9,10)]
+names(df)
+
+```
+
+3. DATA CLEANING
+
+```{r}
+ 
+##Checking for missing values
+
+sum(is.na(df))
+
+```
+
+```{r}
+##Dealing with missing values
+
+ecomm<-na.omit(df)
+sum(is.na(df))
+
+```
+
+```{r}
+##Checking for duplicates
+
+sum(duplicated(df))
+
+```
+
+```{r}
+##Dealing with duplicates
+###To deal with duplicates i pick the non duplicated data
+
+df = ecomm[!duplicated(df), ]
+dim(df)
+
+```
+
+```{r}
+##Checking for outliers
+
+product_related<-df$ProductRelated
+product_related_duration<-df$ProductRelated_Duration
+page_values<-df$PageValues
+Administrative<-df$Administrative
+Administrative_Duration<-df$Administrative_Duration
+Informational<-df$Informational
+Informational_Duration<-df$Informational_Duration
+BounceRates<-df$BounceRates
+ExitRates<-df$ExitRates
+SpecialDay<-df$SpecialDay
+boxplot(product_related,product_related_duration,page_values,SpecialDay,ExitRates,BounceRates,Informational_Duration,Informational,Administrative_Duration,Administrative)
+
+```
+
+The dataset contains some outliers in the Product Related Duration, Informational duration and exit rates
+features
+
+
+
+4. EDA
+
+4.1 Univariate Analysis
+```{r}
+#Summary of the descriptive statistics
+
+summary(df)
+
+```
+
+- From the descriptive statistics weekdays had the most numbers visiting
+the site
+- Majority of the people who visited the site did not generate any revenue
+for the brand
+- Only 1908 out of 12330 contributed to revenue addition
+for the brand
+
+
+```{r}
+#Plotting Histogram of selected features
+
+# install.packages("DataExplorer")
+
+library(DataExplorer)
+plot_histogram(df)
+
+```
+
+There is a positive skew in the distribution Of the features
+
+```{r}
+
+#creating bar plots for all categorical columns
+month_table <- table(ecommerce$Month)
+
+```
+
+```{r}
+#creating barplot for month
+
+barplot(month_table)
+
+##the month of May had the most visits to the site while February was the least visited
+```
+
+```{r}
+#Barplot indicating visitor type
+
+visitor_table <- table(ecommerce$VisitorType)
+barplot(visitor_table)
+```
+
+Returning visitors form the majority of of the visitor type
+
+```{r}
+#Weekend barplot
+
+weekend_table <- table(ecommerce$Weekend)
+barplot(weekend_table)
+
+```
+The site receives more visitors during the weekdays
+
+
+```{r}
+#Revenue barplot
+
+revenue_table <- table(ecommerce$Revenue)
+barplot(revenue_table)
+
+```
+
+- Individuals who visit the site and generate revenue are less
+- Majority of the people visit the site but the visits don't directly generate any revenue
+
+```{r}
+
+#Barplot on traffic type
+
+traffic_table <- table(ecommerce$TrafficType)
+barplot(traffic_table)
+
+```
+
+Type 2 traffic is the highest followed by Type 1 traffic
+
+```{r}
+# Region Barplot
+
+region_table <- table(ecommerce$Region)
+barplot(region_table)
+
+```
+
+Region 1 has the majority of people who visit the site while region 5 has the
+lowest number of visitors
+
+BIVARIATE 
+```{r}
+##correlation
+
+page_values<-ecomm$PageValues
+product_related<-ecomm$ProductRelated
+cor(page_values,product_related)
+
+```
+
+```{r}
+#correlation plot
+
+library(ggcorrplot)
+library(dplyr)
+corr = round(cor(select_if(ecomm, is.numeric)), 4)
+ggcorrplot(corr, hc.order = T, ggtheme = ggplot2::theme_grey,
+   colors = c("cyan", "peachpuff4", "green"), lab = T)
+
+```
+
+There is a high correlation between the bounce rate and the exit rate
+
+```{r}
+##plotting revenue per month
+
+rev_month <- table(ecommerce$Revenue, ecommerce$Month)
+barplot(rev_month, main = "Revenue per Month", col = c("red", "cyan"), beside = TRUE, 
+        legend = rownames(rev_month), xlab = "Month")
+```
+
+November has the highest revenue. This could be explained by huge end of year sales such as Black Friday all month long
+
+```{r}
+##plotting revenue per region
+
+rev_region <- table(ecommerce$Revenue, ecommerce$Region)
+barplot(rev_region, main = "Revenue per Region", col = c("red", "cyan"), beside = TRUE, 
+        legend = rownames(rev_region), xlab = "Region")
+
+```
+
+Region 1 returned the highest revenue while region 5 returned the lowest 
+
+```{r}
+head(ecommerce)
+```
+
+
+```{r}
+df <- ecommerce
+
+```
+
+
+5. IMPLEMENTING THE SOLUTION
+
+## K-MEANS CLUSTERING
+
+#### Normalizing the required features
+
+```{r}
+normalize <- function(x){
+  return ((x-min(x)) / (max(x)-min(x)))
+}
+df$ProductRelated<- normalize(df$ProductRelated)
+df$ProductRelated_Duration<- normalize(df$ProductRelated_Duration)
+df$PageValues<- normalize(df$PageValues)
+head(df)
+```
+
+```{r}
+####selecting necesarry columns
+df1<-ecommerce[c(5,6,9)]
+colnames(df1)
+```
+
+
+```{r}
+
+head(df1)
+
+```
+
+
+```{r}
+df1
+
+```
+
+```{r}
+
+sum(is.na(df1))
+
+```
+
+
+```{r}
+
+df2 <- na.omit(df1)
+
+```
+
+
+```{r}
+
+sum(is.na(df2))
+
+```
+
+
+
+```{r}
+#
+# Applying the K-means clustering algorithm with number of centroids(k)=3
+result<- kmeans(df2,3) 
+
+# Previewing the no. of records in each cluster
+result$size 
+
+```
+
+```{r}
+#value of cluster center datapoint
+result$centers
+```
+
+```{r}
+
+#cluster vector showing each record
+result$cluster
+
+```
+
+```{r}
+# Visualizing the clustering results
+par(mfrow = c(1,2), mar = c(5,4,2,2))
+
+#plotting to see how product related duration and product related have been distributed
+plot(df2[,1:2], col = result$cluster) 
+
+```
+
+```{r}
+#Verifying the results of clustering
+par(mfrow = c(2,2), mar = c(5,4,2,2))
+
+#Plotting product related duration and product related
+plot(df2[c(1,2)], col = result$cluster)
+```
+
+```{r}
+
+#plotting page values and product related duration to check the distribution
+plot(df2[c(2,3)], col = result$cluster)
+
+```
+
+
+```{r}
+#Implementing with class attribute 'revenue'
+
+df2.class<- ecommerce[, "Revenue"]
+
+```
+
+
+```{r}
+
+plot(df2[c(2,3)], col = df2.class)
+
+```
+
+
+
+
+
+HIERARCHICAL CLUSTERING
+```{r}
+# Scaling the data
+
+df2<-scale(df2)
+head(df2)
+
+```
+
+```{r}
+#computing the euclidean distance
+ec<-dist(df2,method = "euclidean")
+
+
+#performing hierarchical clustering
+HC<-hclust(ec,method = "ward.D2")
+
+
+#plotting the dendrogram
+plot(HC,cex=0.001,hang= -1)
+
+```
+- No conclusionsfrom the dendogram
+
+
+
+6. CONCLUSION
+
+- Majority of the people visit the site during the weekdays
+
+- Majority of people visit the site but don't generate revenue
+
+- Most of the returning visitors generate revenue to the brand,this is a good indication of customer loyalty
+
+
+7. RECOMMENDATION
+
+- Providing incentives to returning visitors in order to attract new visitors 
+
+
+

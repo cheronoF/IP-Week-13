@@ -1,0 +1,862 @@
+
+## R Project
+
+# Objective : To Predict whether a user will click on an Ad 
+
+1. Introduction
+
+1.1 Defining the Question
+
+The task is to perform EDA on the dataset to draw insights on whether a user will click an Ad.
+
+
+1.2 The Context
+
+Research Question
+
+A Kenyan entrepreneur has created an online cryptography course and would want to advertise it on her blog. She currently targets audiences originating from various countries. In the past, she ran ads to advertise a related course on the same blog and collected data in the process. She would now like to employ your services as a Data Science Consultant to help her identify which individuals are most likely to click on her ads.
+
+1.1.3 Metrics for Success
+Deriving Insight based on Analysis
+
+
+1.1.4 Experimental Design Taken
+Installing packages and loading libraries needed
+Loading the data
+Data Cleaning
+EDA
+Conclusion
+
+
+1.1.5 Appropriateness of the Data
+Dataset link: http://bit.ly/IPAdvertisingData
+
+The columns in the dataset include:
+
+Daily Time Spent on Site
+Age
+Area Income
+Daily Internet Usage
+Ad Topic Line
+City
+Male - 1 for male, O for female
+Country
+Time Stamp
+Clicked on Ad
+```{r}
+
+#install.packages()
+
+```
+
+```{r}
+
+#local({r <- getOption("repos"); r["CRAN"] <- "https://cran.r-project.org/"; options(repos = r)})
+
+```
+
+
+```{r}
+
+local({r <- getOption("repos"); r["CRAN"] <- "https://cran.r-project.org/"; options(repos = r)})
+
+```
+
+
+```{r}
+
+getOption("repos")
+options(repos = c(CRAN = "https://cran.rstudio.org"))
+
+
+```
+
+
+```{r}
+library(xfun)
+```
+
+
+# Installing necessary packages
+
+
+```{r}
+
+install.packages('xfun')
+
+```
+
+
+```{r}
+
+install.packages("tidyverse")
+
+```
+
+
+```{r}
+library("tidyverse") 
+```
+
+
+```{R}
+library("data.table")
+```
+
+```{r}
+
+data <- fread("http://bit.ly/IPAdvertisingData")
+```
+
+
+```{r}
+
+# Checking the first 5 rows 
+
+head(data)
+
+```
+
+
+```{r}
+
+# Checking the last 5 rows 
+
+tail(data)
+
+```
+
+
+```{r}
+# Checking the number of rows and columns in the dataset
+
+dim(data)
+
+# This daaset has 1000 rows and 10 columns 
+```
+
+
+```{r}
+# checking the types of attributes/data types 
+
+sapply(data, class)
+
+```
+
+
+```{r}
+# Statistical Summary
+
+summary(data)
+
+```
+Data Cleaning
+
+```{r}
+
+# Checking for missing values in the dataset
+
+colSums(is.na(data))
+
+# There are o missing values in this dataset
+
+```
+
+Making the Column Names neat by removing the spaces 
+
+```{r}
+# Checking the column names
+
+names(data)
+
+```
+
+
+```{r}
+# Replacing spaces in the columns names with a .
+
+names(data) <- gsub(" ", ".", names(data))
+
+```
+
+
+```{r}
+# Checking to confirm that the changes have been effected
+
+names(data) 
+
+```
+Univariate Analysis
+Mean
+Median
+Mode
+Maximum
+Minimum
+Range
+Quantile
+Variance
+Standard Deviation
+Boxplot
+
+```{r}
+
+sapply(data, class)
+
+```
+The Mean age is 36
+
+```{r}
+# Checking the mean age
+
+data.Age.mean <- mean(data$Age)
+
+data.Age.mean
+
+```
+The median age is 35
+
+```{r}
+
+data.Age.median <- median(data$Age)
+
+data.Age.median 
+
+```
+
+# Creating a function to check the mode
+```{r}
+
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}   
+   
+   
+```
+
+
+
+```{r}
+
+data.Age.mode <- getmode(data$Age)
+
+data.Age.mode
+
+```
+The Modal age is 31
+
+
+ 
+
+```{r}
+# The minimum and maximum ages
+data.Age.min <- min(data$Age)
+
+data.Age.min
+
+data.Age.max <- max(data$Age)
+
+data.Age.max
+
+```
+The minimum and maximum ages are 19 and 61 respectively
+
+
+
+The age range is 19 to 61
+```{r}
+
+data.Age.range <- range(data$Age)
+
+data.Age.max
+
+```
+
+This is the interquartile range
+```{r}
+
+data.Age.quantile <- quantile(data$Age)
+
+data.Age.quantile
+
+
+```
+This is the Variance
+```{r}
+
+data.Age.variance <- var(data$Age)
+
+data.Age.variance
+
+```
+
+Box plot for age
+```{r}
+
+boxplot(data$Age)
+
+```
+
+
+
+```{r}
+
+data.Daily.Time.Spent.on.Site.mean <- mean(data$Daily.Time.Spent.on.Site)
+
+data.Daily.Time.Spent.on.Site.mean
+
+```
+The mean time spent on the site daily is 65 minutes
+
+
+
+
+
+```{r}
+
+data.Daily.Time.Spent.on.Site.median <- median(data$Daily.Time.Spent.on.Site)
+
+data.Daily.Time.Spent.on.Site.median 
+
+```
+The median amount of time spent daily on the site is 68 minutes
+
+
+
+
+
+```{r}
+
+data.Daily.Time.Spent.on.Site.min <- min(data$Daily.Time.Spent.on.Site)
+
+data.Daily.Time.Spent.on.Site.min
+
+data.Daily.Time.Spent.on.Site.max <- max(data$Daily.Time.Spent.on.Site)
+
+data.Daily.Time.Spent.on.Site.max
+
+```
+The minimum and maximum amount of time spent daily on the website is 32 and 91 minutes respectively
+
+
+
+
+
+```{r}
+
+data.Daily.Time.Spent.on.Site.variance <- var(data$Daily.Time.Spent.on.Site)
+
+data.Daily.Time.Spent.on.Site.variance
+
+
+```
+
+
+
+UNIVARIATE ANALYSIS ON Area Income
+
+```{r}
+
+data.Area.Income.mean <- mean(data$Area.Income)
+
+data.Area.Income.mean
+
+```
+The average income is $55,000
+
+
+
+
+```{r}
+
+data.Area.Income.median <- median(data$Area.Income)
+
+data.Area.Income.median
+
+
+```
+
+
+```{r}
+data.Area.Income.min <- min(data$Area.Income)
+
+data.Area.Income.min
+
+data.Area.Income.max <- max(data$Area.Income)
+
+data.Area.Income.max
+
+```
+
+- The lowest income is $13,996 and the highest amount is $79,484.8 per annum
+
+
+
+
+
+```{r}
+
+data.Area.Income.variance <- var(data$Area.Income)
+
+data.Area.Income.variance
+
+```
+
+
+
+
+
+Boxplot for Income
+
+```{r}
+
+boxplot(data$Area.Income)
+
+```
+- There are a few Outliers on the lower income scale, but we won't drop them because they are true representatives of earning capacity.
+
+
+
+
+
+
+
+```{r}
+# Stacked bar chart 
+
+
+# Giving a title to the chart
+# Labeling the x and y axis
+# Setting the color options
+# Creating a legend for easier reference
+
+counts <- table(data$Clicked.on.Ad, data$Age)
+barplot(counts,
+  main="A stacked bar chart showing Clicked on Ad by Age",
+  xlab="Age",
+  ylab = "Frequency",
+  col=c("pink","blue"),
+  legend = rownames(counts))
+
+```
+- 1 shows that the participant clicked on an Ad.
+
+- The stacked bar chart shows the distribution of the number of people who
+clicked on an Ad by age.
+
+- The highest age of the participants was 61 and lowest was 19.
+
+- The people who clicked most on Ads were between age 28 to 36.
+
+
+
+
+
+
+```{r}
+
+counts <- table(data$Clicked.on.Ad, data$Male)
+barplot(counts,
+  main="A stacked bar chart showing Clicked on Ad by Gender",
+  xlab="Gender",
+  ylab = "Frequency",
+  col=c("pink","blue"),
+  legend = rownames(counts))
+```
+- From the fgure above, there are more female participants, and that translates to more females clicking in the ads. 
+
+
+
+
+
+```{r}
+
+install.packages("CGPfunctions")
+
+```
+
+
+
+```{r}
+
+# Bar chart of the target variable
+
+counts <- table(data$Clicked.on.Ad)
+barplot(counts,
+  main="A bar chart showing Clicked on Ad distribution",
+  xlab="Clicked on Ad or Not",
+  ylab = "Frequency",
+  col=c("pink","blue"),
+  legend = rownames(counts))
+
+```
+- 50% of the users clicked on ad and 50% did not click on the ads
+
+
+
+
+Multivariate Analysis 
+
+
+```{r}
+
+library("ggplot2")
+
+```
+
+```{r}
+install.packages("ggcorrplot")
+
+```
+
+
+```{r}
+
+library("ggcorrplot")
+
+```
+
+
+```{r}
+# Heat map
+# Checking the relationship between the variables using numeric variables
+
+
+numeric_tbl <- data %>%
+  select_if(is.numeric) %>%
+  select(Daily.Time.Spent.on.Site, Age, Area.Income,Daily.Internet.Usage)
+
+# Calculating the correlations
+corr <- cor(numeric_tbl, use = "complete.obs")
+
+ggcorrplot(round(corr, 2), 
+           type = "upper", lab = TRUE)
+```
+- There is a positive high correlation between the daily time spent on the internet and Time spent on the site
+
+
+
+
+```{r}
+
+install.packages("vtree")
+
+```
+
+```{r}
+library(vtree)
+
+vtree(data, "Clicked.on.Ad")
+
+```
+- Based on the image below, 50% of the users clicked on the ad and 50% of them didn't
+
+
+
+
+```{r}
+vtree(data, "Male")
+
+```
+
+- There are more Female Participants at 52%
+
+
+```{r}
+library("tidyr")
+library("dplyr")
+library("purrr")
+```
+
+```{r}
+install.packages("ggsci")
+library("ggsci") # to add as color palette
+```
+
+
+```{r}
+vtree(data, c("Male", "Clicked.on.Ad"), 
+   horiz = FALSE)
+
+```
+- Fewer males are present in the dataset but based on the vtree graph above, fewer men click on the ads
+
+  
+  
+CONCLUSIONS
+
+1. The highest age of the participants was 61 and lowest was 19.
+
+2. The people who clicked most on Ads were between age 28 to 36.
+3. There is a positive correlation between the daily time spent on the internet    and Time spent on the site
+4. Based on the image below, 50% of the users clicked on the ad and 50% of them    didn't
+5. There are more Female Participants at 52%
+6. Fewer males are present in the dataset but based on the vtree graph above,     fewer men click on the ads
+
+
+
+
+
+RECOMMENDATIONS
+
+1. The Website owner should push more ads towards the female users 
+2. The users between the ages of 26 to 35 should be targeted. The reason behind
+   this could be because they're more curious and they have a higher risk         appetite
+
+
+
+SUPERVISED LEARNING ALGORITHMS
+1. KNN
+2. DECISION TREES 
+3. SVM
+4. NAIVE BAYES
+
+
+1. KNN 
+
+```{r}
+
+summary(data)
+
+```
+
+
+```{r}
+
+head(data)
+
+```
+```{r}
+
+dim(data)
+
+```
+```{r}
+
+type(data)
+
+```
+
+
+
+Implementing the Solution using KNN
+
+We will convert our labels on the target variable to be categorical
+
+```{r}
+#Converting labels to categorical
+
+data$Clicked.on.Ad <- factor(data$Clicked.on.Ad)
+
+```
+
+
+We will then check for class imbalance
+
+```{r}
+
+round(prop.table(table(data$Clicked.on.Ad)) * 100, digits = 1)
+
+```
+
+There seems to be no data imbalance in our dataset
+
+
+```{r}
+sapply(data, class)
+
+```
+
+
+We will now select the features we shall use for modelling
+```{r}
+
+#Feature selection
+
+df <-  data.frame(data$Daily.Time.Spent.on.Site,data$Age,data$Area.Income,data$Daily.Internet.Usage,data$Male, data$Clicked.on.Ad)
+
+```
+
+```{r}
+#Displaying the structure of our dataframe
+str(df)
+```
+```{r}
+
+head(df)
+
+```
+
+```{r}
+
+summary(df)
+
+
+```
+
+
+Cc
+
+
+```{r}
+
+str(df)
+
+```
+
+
+
+
+
+Normalizing our data
+```{r}
+
+#Normalization function
+normalize <- function(x) {
+return ((x - min(x)) / (max(x) - min(x))) }
+
+```
+
+
+```{r}
+
+#Normalizing the data
+data_norm <- as.data.frame(lapply(df[,1:5], normalize))
+#Previewing the dataset
+head(data_norm)
+
+```
+
+Splitting the dataset
+```{r}
+
+set.seed(1234)
+#random selection of 70% data.
+ad <- sample(1:nrow(data_norm),size=nrow(data_norm)*0.7,replace = FALSE) 
+ 
+train <- df[ad,] 
+test <- df[-ad,] 
+train_label <- df[ad,6]
+test_label <-df[-ad,6]
+
+```
+
+
+Building the model
+```{r}
+#Installing class packages required
+
+install.packages("class", dependencies = TRUE)
+
+```
+
+```{r}
+
+install.packages("kernlab")
+
+```
+
+```{r}
+
+install.packages("e1071")
+
+```
+
+
+
+```{r}
+#Loading the libraries required
+
+library("class")
+library("caret")
+library("kernlab")
+library("e1071")
+
+```
+
+
+```{r}
+#Checking the number of observations
+NROW(train_label)
+
+```
+
+```{r}
+
+# Instantiating the KNN function
+knn <- knn(train=train, test=test, cl=train_label, k=26)
+
+```
+
+```{r}
+
+confusionMatrix(table(knn,test_label))
+
+```
+KNN model gives us an accuracy of 68% using a training set of 70%
+
+
+
+SVM
+
+```{r}
+
+set.seed(7)
+intrain <- caret::createDataPartition(df$Clicked.on.Ad, p=0.7, list=FALSE)
+test <- df[-intrain,]
+train <- df[intrain,]
+
+```
+
+
+
+```{r}
+sapply(df, class)
+
+```
+
+
+```{r}
+
+#Using a training size of 70%
+
+intrain <- createDataPartition(y = df$Clicked.on.Ad, p= 0.7, list = FALSE)
+train <- df[intrain,]
+test <- df[-intrain,]
+
+```
+
+```{r}
+
+#Ensuring the variabke to be predicted is categorical
+train[["Clicked.on.Ad"]] = factor(train[["Clicked.on.Ad"]])
+
+```
+
+```{r}
+
+#Train control to train data on different algorithm
+tr_ctl <- trainControl(method = "repeatedcv", number = 10, repeats = 5)
+
+```
+
+
+
+```{r}
+svm_Linear <- train(Clicked.on.Ad ~., data = train, method = "svmLinear",
+trControl=tr_ctl, preProcess = c("center", "scale"), tuneLength = 10)
+```
+
+```{r}
+test_pred <- predict(svm_Linear, newdata = test)
+confusionMatrix(table(test_pred, test$Clicked.on.Ad))
+
+```
+
+
+KNN has an accuracy of 68% and factor analysis may be necessary to improve the accuracy of the model 
+
+
+
+
+
