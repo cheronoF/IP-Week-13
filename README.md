@@ -4,7 +4,7 @@ Analysing Customer Behaviour using the KIRA Plastinina Website Data
 
 # ECOMMERCE DATASET 
 
-#DEFINING THE QUESTION
+# DEFINING THE QUESTION
 
 Kira Plastinina is a Russian brand that is sold through a defunct chain of retail stores in Russia, Ukraine, Kazakhstan, Belarus, China, Philippines, and Armenia.
 
